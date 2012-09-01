@@ -4,4 +4,14 @@ object Colors extends Enumeration {
   type Color = Value
   val Blue, Red, Green = Value
 }
-class TODO extends RuntimeException("TODO")
+
+object Sex extends Enumeration {
+  type Sex = Value
+  val Male, Female = Value
+}
+
+class TODOException extends RuntimeException("TODO")
+
+object Helpers {
+  def TODO = throw new TODOException
+}

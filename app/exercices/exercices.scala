@@ -11,12 +11,13 @@
 
 package exercices
 import provided._
+import provided.Helpers._
 
 // TODO:
 // implicit parameters
 // implicit conversion
 // Pattern Matching
-// Apply / Unapply
+// apply / unapply
 // type alias
 // covariance / contravariance
 // parameters default values
@@ -49,7 +50,7 @@ object Classes {
   * - a firstname
   * - a lastname
   * - an age
-  * - a sex
+  * - a sex (Of type Sex)
   * Optionnal: A Person can only be a Man or a Woman, anything else should not Compile
   *    ➽ http://www.scala-lang.org/node/123
   */
@@ -118,7 +119,7 @@ object Classes {
 // A companion object differs from other objects as it has access rights to the class/trait that other objects do not.
 // In particular it can access methods and fields that are private in the class/trait."
 //  ➲ http://daily-scala.blogspot.fr/2009/09/companion-object.html
-object Companion {
+object Companions {
   class User(login: String, password: String)
 
   /**
@@ -126,9 +127,9 @@ object Companion {
   * Implement user Apply and unapply methods
   */
   object User {
-    def apply(login: String, password: String): User = throw new TODO
+    def apply(login: String, password: String): User = TODO
     //  ➽ http://www.scala-lang.org/node/112
-    def unapply(u: User): Option[(String, String)]= throw new TODO
+    def unapply(u: User): Option[(String, String)]= TODO
   }
 }
 
@@ -142,26 +143,26 @@ object Functions {
   * - It's just a nice syntax for Function[Int, Int, Int]
   * - In scala, Functions are Objects too
   */
-  val add: ((Int, Int) => Int) = throw new TODO
+  val add: ((Int, Int) => Int) = TODO
 
   /**
   * TODO:
   * create a add2 function, that takes an Int and add 2 to it
   */
-  val add2: (Int => Int) = throw new TODO
+  val add2: (Int => Int) = TODO
 
   /**
   * TODO:
   * create a addAnythingBuidler function, that takes an Int and add 2 to it
   * addAnythingBuidler(2)(4) == 6
   */
-  val addAnythingBuidler: (Int => Int => Int) = throw new TODO
+  val addAnythingBuidler: (Int => Int => Int) = TODO
 
   /**
   * TODO:
   * re-implement add2, usgin addAnythingBuidler
   */
-  val addII: (Int => Int) = throw new TODO
+  val addII: (Int => Int) = TODO
 
 }
 
@@ -174,7 +175,7 @@ object Collections {
   * @return The sum of all elements in the List
   */
   def uglysum(xs: List[Int]): Int = {
-    throw new TODO
+    TODO
   }
 
   //  ★  ★  ★  ★  ★  ★  ★  ★  ★  ★  ★  ★  ★  ★  ★  ★  ★  ★  ★  ★  ★  ★  ★  ★  ★  ★  ★  ★  ★
@@ -203,14 +204,14 @@ object Collections {
   * Compute the sum of all elements in the List
   */
   def sum(xs: List[Int]): Int = {
-    throw new TODO
+    TODO
   }
 
   /**
   * TODO:
   * Add 2 to all elements of the provided List
   */
-  def add2toAlll(xs: List[Int]): List[Int] = throw new TODO
+  def add2toAlll(xs: List[Int]): List[Int] = TODO
 
   /**
   * TODO:
@@ -221,20 +222,20 @@ object Collections {
   *    Int => (List[Int] => List[Int])
   * - It takes a Int as a parameter (x) and returns a function, taking a List[Int], and returning a List[Int]
   */
-  def addToAll(xs: List[Int])(x: Int): List[Int] = throw new TODO
+  def addToAll(xs: List[Int])(x: Int): List[Int] = TODO
 
   /**
   * TODO:
   * Rewrite add2toAll using addToAll and partial function application
   */
-  def nicelyAdd2ToAll(xs: List[Int]): List[Int] = throw new TODO
+  def nicelyAdd2ToAll(xs: List[Int]): List[Int] = TODO
 
   /**
   * TODO:
   * Write the map function
   * This function applies the f function to all the elements of xs
   */
-  def map(f: Int => Int)(xs: List[Int]): List[Int] = throw new TODO
+  def map(f: Int => Int)(xs: List[Int]): List[Int] = TODO
 
   /**
   * TODO:
@@ -253,25 +254,25 @@ object Collections {
   * Write the reduce function
   * reduce((acc, current) => acc + current)(List(1, 2, 3, 4, 5)) == 15
   */
-  def reduce(f: (Int, Int) => Int)(xs: List[Int]) = throw new TODO
+  def reduce(f: (Int, Int) => Int)(xs: List[Int]) = TODO
 
   /**
   * TODO:
   * Write the fold function
   */
-  def fold(f: (Int, Int) => Int, init: Int)(xs: List[Int]) = throw new TODO
+  def fold(f: (Int, Int) => Int, init: Int)(xs: List[Int]) = TODO
 
   /**
   * TODO:
   * re-write reduce using fold
   */
-  def reduceByFolding(f: (Int, Int) => Int)(xs: List[Int]) = throw new TODO
+  def reduceByFolding(f: (Int, Int) => Int)(xs: List[Int]) = TODO
 
   /**
   * TODO:
   * re-write the map function using fold
   */
-  def mapByFolding(f: Int => Int)(xs: List[Int]): List[Int] = throw new TODO
+  def mapByFolding(f: Int => Int)(xs: List[Int]): List[Int] = TODO
 
   // >>> Read It Later
   //  ➽ http://www.codecommit.com/blog/scala/scala-collections-for-the-easily-bored-part-1
