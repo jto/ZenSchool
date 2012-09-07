@@ -16,6 +16,10 @@ class CompanionsSpec extends Specification {
 
     "be usable in pattern matching" in {
       val u = User("jto", "s3cr3t")
+      u match {
+        case User("jto", "s3cr3t") => success
+        case _ => fail("Pattern matching on User failed")
+      }
     }
   }
 }
