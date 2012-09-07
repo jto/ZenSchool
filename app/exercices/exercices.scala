@@ -14,14 +14,17 @@ import provided._
 import provided.Helpers._
 
 // TODO:
-// implicit parameters
-// implicit conversion
-// Pattern Matching
-// apply / unapply
-// type alias
-// covariance / contravariance
-// parameters default values
-// Streams
+// ✗ implicit parameters
+// ✗ implicit conversion
+// ✗ Pattern Matching
+//  ✔ apply / unapply
+// ✗ type alias
+// ✗ covariance / contravariance
+// ✗ parameters default values
+// ✗ Streams
+// ✗ Operator overloading
+// ✗ flatMap !!!!
+
 
 //
 //     /$$   /$$                           /$$       /$$   /$$           /$$                  /$$$$
@@ -235,13 +238,13 @@ object Collections {
   * Write the map function
   * This function applies the f function to all the elements of xs
   */
-  def map(f: Int => Int)(xs: List[Int]): List[Int] = TODO
+  def map(f: (Int => Int))(xs: List[Int]): List[Int] = TODO
 
   /**
   * TODO:
   * Explain what this does
   */
-  def add2ToAllAgain(xs: List[Int]) = map(x => x + 2)(xs)
+  def add2ToAllAgain(xs: List[Int]): List[Int] = map(x => x + 2)(xs)
 
   /**
   * TODO:
@@ -254,19 +257,19 @@ object Collections {
   * Write the reduce function
   * reduce((acc, current) => acc + current)(List(1, 2, 3, 4, 5)) == 15
   */
-  def reduce(f: (Int, Int) => Int)(xs: List[Int]) = TODO
+  def reduce(f: (Int, Int) => Int)(xs: List[Int]): Int = TODO
 
   /**
   * TODO:
   * Write the fold function
   */
-  def fold(f: (Int, Int) => Int, init: Int)(xs: List[Int]) = TODO
+  def fold(f: (Int, Int) => Int, init: Int)(xs: List[Int]): Int = TODO
 
   /**
   * TODO:
   * re-write reduce using fold
   */
-  def reduceByFolding(f: (Int, Int) => Int)(xs: List[Int]) = TODO
+  def reduceByFolding(f: (Int, Int) => Int)(xs: List[Int]): Int = TODO
 
   /**
   * TODO:
