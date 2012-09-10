@@ -286,3 +286,6 @@ object Collections {
 object Generics {
 
 }
+
+// >>> More exercices
+//  ➽ http://blog.tmorris.net/monad-exercises-in-scala/
