@@ -14,16 +14,18 @@ import provided._
 import provided.Helpers._
 
 // TODO:
-// ✗ implicit parameters
-// ✗ implicit conversion
-// ✗ Pattern Matching
-//  ✔ apply / unapply
-// ✗ type alias
+// ✔ implicit parameters
+// ✔ implicit conversion
+// ✔ Pattern Matching
+// ✔ apply / unapply
+// ✔ type alias
 // ✗ covariance / contravariance
 // ✗ parameters default values
 // ✗ Streams
-// ✗ Operator overloading
-// ✗ flatMap !!!!
+// ✗ Option
+// ✗ Either
+// ✔ Operator overloading
+// ✔ flatMap !!!!
 
 
 //
@@ -57,6 +59,7 @@ object Classes {
   * Optionnal: A Person can only be a Man or a Woman, anything else should not Compile
   *    ➽ http://www.scala-lang.org/node/123
   */
+  import Sex.Sex
   trait Person
 
   /**
@@ -274,6 +277,7 @@ object Collections {
   /**
   * TODO:
   * re-write the map function using fold
+  * you can use List#foldLeft
   */
   def mapByFolding(f: Int => Int)(xs: List[Int]): List[Int] = TODO
 
@@ -285,7 +289,217 @@ object Collections {
 
 object Generics {
 
+  /**
+  * TODO:
+  * write a generic version of fold
+  * - It should work on a List on Anything
+  * - init parameter can have any type
+  * - The return type is NOT Unit, you have to find it
+  */
+  def fold[A, B](f: (B, A) => B, init: B)(xs: List[A]): B = xs match {
+    case Nil => init
+    case x :: xs => fold(f, f(init, x))(xs)
+  }
+
+  /**
+   * TODO:
+   * write a generic version of map
+   * - It should work on a List on anything
+   * - the f function can return anything
+   * - Find the return type by yourself
+   */
+   def map[A, B](f: A => B)(xs: List[A]) = fold((acc: List[B], n: A) => f(n) :: acc ,Nil)(xs).reverse
+
+   /**
+   * TODO:
+   * write a generic reduce, using your implementation of fold
+   * The return type is something that extends A (xs is a List[A])
+   */
+   def reduce[A, B >: A](f: (B, A) => B)(xs: List[A]): B = fold(f, xs.head)(xs.tail)
+
+
+   /**
+    * TODO:
+    * implement the flatMap method
+    * flatMap
+    * - Takes a List of anything (call it A)
+    * - Takes a function from A to something else (call it B)
+    * - it returns a List of B
+    */
+   def flatMap[A, B](f: (A) => List[B])(xs: List[A]): List[B] = fold({ (acc: List[B], n: A) =>
+     f(n) ++ acc
+   }, Nil)(xs)
+
+
+   /**
+    * TODO:
+    * write the filter method using flatMap
+    * It take a List of anything (call it A), a function from that takes an A and give a Boolean
+    * It returns a List of A
+    */
+   def filter[A](f: A => Boolean)(xs: List[A]) = flatMap( { x: A => f(x) match {
+     case true => List(x)
+     case _ => Nil
+   }})(xs)
+
+    /**
+     * TODO:
+     * write the zip method
+     * It takes a List[A], a List[B] and returns a List[(A,B)] (use map)
+     */
+    def zip[A, B](xs1: List[A], xs2: List[B]): List[(A, B)] = TODO
+
+    // TODO: http://stackoverflow.com/questions/4465948/what-are-scala-context-and-view-bounds
+    // <%
+    // TODO: http://stackoverflow.com/questions/3427345/what-do-and-mean-in-scala-2-8-and-where-are-they-documented
+    //, =:=, <:<, <%<
+
 }
+
+
+object Flatmap{
+  import provided.models._
+  import scala.util.control._
+
+   /**
+   * TODO:
+   * write the findAll method
+   * It takes a List[String], and parse Ints, and call DAO.get to find Users in database
+   * use the provided.Helpers#parseInt (in provided.scala), and List#flatmap
+   */
+  def findAll(ids: List[String]): List[User] = TODO
+
+
+  /**
+   * TODO:
+   * re-write findAll, using for comprehension
+   */
+  def findAllWithFor(ids: List[String]): List[User] = TODO
+}
+
+object Implicits {
+
+
+  /**
+   * TODO:
+   * When WhatsThisType is used, you have to replace it by the real type
+   */
+  type WhatsThisType = Any
+
+  /**
+   * TODO:
+   * correct the signature of the eq method
+   */
+  trait Equality[X] {
+    // def eq (a: WhatsThisType, b: WhatsThisType): Boolean
+    def eq (a: X, b: X): Boolean
+  }
+
+
+  /**
+   * TODO:
+   * Create an implementation of Equality that knows how to compare Int
+   */
+  object IntEquality extends Equality[Int] {
+    override def eq(a: Int, b: Int): Boolean = a == b
+  }
+
+  /**
+   * TODO:
+   * Create an implementation of Equality that knows how to compare Int
+   */
+  object StringEquality  extends Equality[String] {
+    override def eq(a: String, b: String): Boolean = a == b
+  }
+
+  /**
+  * TODO:
+  * write the === method
+  * It takes two element of the same type, and implicitly take an implementation if Equality for this type
+  * It returns true if elements are equals, false otherwise
+  */
+  //def areEquals(a: WhatsThisType, b: WhatsThisType)(implicit c: WhatsThisType) = TODO
+  def areEquals[X](a: X, b: X)(implicit c: Equality[X]) = c.eq(a, b)
+
+
+  /**
+   * TODO:
+   * Create an implementation of Equality that knows how to compare List of anything for which there is an implementation od Equality in Scope
+   * List are equals if
+   * - They have the same size
+   * - elements are equals, and in the same order
+   * HELP: use the implicitly method
+   *  ➽ http://www.scala-lang.org/api/current/scala/Predef$.html
+   * HELP: You should probably make all implementation of Equality usable as implicit parameters
+   */
+   object ListEquality {
+     // [X: Equality] This means that there should be an implementation of Equality[X] available in scope
+     //def eq[X: Equality](a: WhatsThisType, b: WhatsThisType): Boolean = TODO
+     def eq[X: Equality](as: List[X], bs: List[X]): Boolean = {
+       as.zip(bs).forall{
+         case (a, b) => implicitly[Equality[X]].eq(a, b)
+      }
+     }
+   }
+
+  /**
+   * TODO:
+   * write the === method
+   * It takes two element of the same type, and implicitly take an implementation if Equality for this type
+   * It returns true if elements are equals, false otherwise
+   */
+  trait Equalizer[X] {
+    def value: X
+    def ===(b: X)(implicit c: Equality[X]): Boolean = c.eq(value, b)
+  }
+
+  /**
+   * TODO:
+   * implement the 3 implicit conversion methods
+   */
+  object Conversions {
+    implicit def intToEqualizer(i: Int) = new Equalizer[Int] {
+      def value = i
+    }
+    implicit def stringToEqualizer(s: String) = new Equalizer[String] {
+      def value = s
+    }
+    implicit def listToEqualizer[A](xs: List[A]) = new Equalizer[List[A]] {
+      def value = xs
+    }
+  }
+
+
+  /**
+  * TODO; write an implementation of EqEquality that work for any type X that have a method ==(b: X): Boolean
+  * HELP: google Structural typing
+  */
+  // TODO: ask Sadek
+  type C= { def ==(b: C): Boolean }
+  object EqEquality extends Equality[C]{
+    override def eq(a: C, b: C): Boolean = a == b
+  }
+
+}
+
+
+object FunkyUnapply {
+  object &&& {
+    def unapply[A,B](t: (Option[A], Option[B])): Option[(A, B)] =
+      for(
+        t1 <- t._1;
+        t2 <- t._2
+      ) yield (t1, t2)
+  }
+
+  object ||| {
+    def unapply[A,B](t: (Option[A], Option[B])): Option[(Option[A], Option[B])] = t match {
+      case (o1: None.type, o2: None.type) => None
+      case _ => Option(t._1 -> t._2)
+    }
+  }
+}
+
 
 // >>> More exercices
 //  ➽ http://blog.tmorris.net/monad-exercises-in-scala/
