@@ -505,9 +505,6 @@ object Implicits {
     implicit def stringToEqualizer(s: String) = new Equalizer[String] {
       def value = s
     }
-    implicit def listToEqualizer[A](xs: List[A]) = new Equalizer[List[A]] {
-      def value = xs
-    }
   }
 
 }
