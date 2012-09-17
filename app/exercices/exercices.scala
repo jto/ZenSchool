@@ -436,12 +436,17 @@ object Implicits {
     def eq (a: X, b: X): Boolean
   }
 
+  trait EEquality[E[_]] {
+    // def eq (a: WhatsThisType, b: WhatsThisType): Boolean
+    def eq[X: Equality](a: E[X], b: E[X]): Boolean
+  }
+
 
   /**
    * TODO:
    * Create an implementation of Equality that knows how to compare Int
    */
-  object IntEquality extends Equality[Int] {
+  implicit object IntEquality extends Equality[Int] {
     override def eq(a: Int, b: Int): Boolean = a == b
   }
 
@@ -449,7 +454,7 @@ object Implicits {
    * TODO:
    * Create an implementation of Equality that knows how to compare Int
    */
-  object StringEquality  extends Equality[String] {
+  implicit object StringEquality  extends Equality[String] {
     override def eq(a: String, b: String): Boolean = a == b
   }
 
@@ -473,13 +478,17 @@ object Implicits {
    *  ➽ http://www.scala-lang.org/api/current/scala/Predef$.html
    * HELP: You should probably make all implementation of Equality usable as implicit parameters
    */
-   object ListEquality {
+   implicit object ListEquality extends EEquality[List]{
      // [X: Equality] This means that there should be an implementation of Equality[X] available in scope
      //def eq[X: Equality](a: WhatsThisType, b: WhatsThisType): Boolean = TODO
      def eq[X: Equality](as: List[X], bs: List[X]): Boolean = {
-       as.zip(bs).forall{
-         case (a, b) => implicitly[Equality[X]].eq(a, b)
-      }
+       if(as.length != bs.length)
+        false
+       else{
+         as.zip(bs).forall{
+            case (a, b) => implicitly[Equality[X]].eq(a, b)
+         }
+       }
      }
    }
 
@@ -493,6 +502,10 @@ object Implicits {
     def value: X
     def ===(b: X)(implicit c: Equality[X]): Boolean = c.eq(value, b)
   }
+  trait EEqualizer[X, E[X]] {
+    def value: E[X]
+    def ===(b: E[X])(implicit c: EEquality[E], e: Equality[X]): Boolean = c.eq(value, b)
+  }
 
   /**
    * TODO:
@@ -503,6 +516,10 @@ object Implicits {
       def value = i
     }
     implicit def stringToEqualizer(s: String) = new Equalizer[String] {
+      def value = s
+    }
+
+    implicit def listToEEqualizer[X: Equality](s: List[X]) = new EEqualizer[X, List] {
       def value = s
     }
   }
