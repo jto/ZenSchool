@@ -13,20 +13,6 @@ package exercices
 import provided._
 import provided.Helpers._
 
-// TODO:
-// ✔ implicit parameters
-// ✔ implicit conversion
-// ✔ Pattern Matching
-// ✔ apply / unapply
-// ✔ type alias
-// ✗ covariance / contravariance
-// ✗ parameters default values
-// ✗ Streams
-// ✗ Option
-// ✗ Either
-// ✔ Operator overloading
-// ✔ flatMap !!!!
-
 
 //
 //     /$$   /$$                           /$$       /$$   /$$           /$$                  /$$$$
@@ -60,42 +46,53 @@ object Classes {
   *    ➽ http://www.scala-lang.org/node/123
   */
   import Sex.Sex
-  trait Person
+  // sealed == only classes in this file can extend Person
+  sealed trait Person {
+    def firstname: String
+    def lastname: String
+    def age: Int
+    def sex: Sex
+  }
 
   /**
   * TODO:
   * Create the Man class
   * A Man is a Person, with sex "Male"
   */
-  class Man
+  class Man(override val firstname: String, override val lastname: String, override val age: Int) extends Person {
+    val sex = Sex.Male
+  }
 
   /**
   * TODO:
   * Create the Man class
   * A Man is a Person, with sex "Woman"
   */
-  class Woman
-
+  class Woman(override val firstname: String, override val lastname: String, override val age: Int) extends Person {
+    val sex = Sex.Female
+  }
   /**
   * TODO:
   * The Etiquette trait
   * The Etiquette trait has:
   * - a method called `greet` the method takes a Person, and say Hello to that person`
   */
-  trait Etiquette
+  trait Etiquette {
+    def greet(p: Person) = "Hello %s".format(p.firstname)
+  }
 
   /**
   * A Gentleman is a Man with good manners
   */
-  class Gentleman
+  class Gentleman(override val firstname: String, override val lastname: String, override val age: Int) extends Man(firstname, lastname, age) with Etiquette
 
   /**
   * A Lady is a Woman with good manners
   */
-  class Lady
+  class Lady(override val firstname: String, override val lastname: String, override val age: Int) extends Woman(firstname, lastname, age) with Etiquette
 
   import Colors._ //Use Colors.Red or Colors.Blue
-  class Scarf(color: Color)
+  class Scarf(val color: Color)
 
   /**
   * TODO:
@@ -108,7 +105,16 @@ object Classes {
   *     ➽ http://www.scala-lang.org/node/120
   */
   trait Knitter {
-    def knit(to: Person): Scarf
+
+    self: Woman =>
+
+    import Sex._
+
+    def knit(to: Person): Scarf = to match {
+      case m: Man => new Scarf(Colors.Blue)
+      case w: Woman => new Scarf(Colors.Red)
+      // Note: We don't have to Match on _, since trait Person is sealed, the compiler knows that this match is exhaustive
+    }
   }
 
 
@@ -116,7 +122,7 @@ object Classes {
   * TODO:
   * An Granny is a Lady who knows the fine art of Knitting
   */
-  class Granny
+  class Granny(override val firstname: String, override val lastname: String, override val age: Int) extends Lady(firstname, lastname, age) with Knitter
 }
 
 
@@ -126,16 +132,16 @@ object Classes {
 // In particular it can access methods and fields that are private in the class/trait."
 //  ➲ http://daily-scala.blogspot.fr/2009/09/companion-object.html
 object Companions {
-  class User(login: String, password: String)
+  class User(val login: String, val password: String)
 
   /**
   * TODO:
   * Implement user Apply and unapply methods
   */
   object User {
-    def apply(login: String, password: String): User = TODO
+    def apply(login: String, password: String): User = new User(login, password)
     //  ➽ http://www.scala-lang.org/node/112
-    def unapply(u: User): Option[(String, String)]= TODO
+    def unapply(u: User): Option[(String, String)]= Some(u.login -> u.password)
   }
 }
 
@@ -149,26 +155,26 @@ object Functions {
   * - It's just a nice syntax for Function[Int, Int, Int]
   * - In scala, Functions are Objects too
   */
-  val add: ((Int, Int) => Int) = TODO
+  val add: ((Int, Int) => Int) = (x, y) => x + y
 
   /**
   * TODO:
   * create a add2 function, that takes an Int and add 2 to it
   */
-  val add2: (Int => Int) = TODO
+  val add2: (Int => Int) = _ + 2
 
   /**
   * TODO:
   * create a addAnythingBuidler function, that takes an Int and add 2 to it
   * addAnythingBuidler(2)(4) == 6
   */
-  val addAnythingBuidler: (Int => Int => Int) = TODO
+  val addAnythingBuidler: (Int => Int => Int) = x => y => x + y
 
   /**
   * TODO:
   * re-implement add2, usgin addAnythingBuidler
   */
-  val addII: (Int => Int) = TODO
+  val addII: (Int => Int) = addAnythingBuidler(2)
 
 }
 
@@ -181,7 +187,10 @@ object Collections {
   * @return The sum of all elements in the List
   */
   def uglysum(xs: List[Int]): Int = {
-    TODO
+    var sum = 0
+    for(v <- xs)
+      sum += v
+    sum
   }
 
   //  ★  ★  ★  ★  ★  ★  ★  ★  ★  ★  ★  ★  ★  ★  ★  ★  ★  ★  ★  ★  ★  ★  ★  ★  ★  ★  ★  ★  ★
@@ -209,15 +218,19 @@ object Collections {
   * TODO:
   * Compute the sum of all elements in the List
   */
-  def sum(xs: List[Int]): Int = {
-    TODO
+  def sum(xs: List[Int]): Int = xs match {
+    case Nil => 0
+    case head::tail => head + sum(tail)
   }
 
   /**
   * TODO:
   * Add 2 to all elements of the provided List
   */
-  def add2toAlll(xs: List[Int]): List[Int] = TODO
+  def add2toAlll(xs: List[Int]): List[Int] = xs match {
+    case head::tail => (head + 2) :: add2toAlll(tail)
+    case _ => Nil
+  }
 
   /**
   * TODO:
@@ -228,30 +241,39 @@ object Collections {
   *    Int => (List[Int] => List[Int])
   * - It takes a Int as a parameter (x) and returns a function, taking a List[Int], and returning a List[Int]
   */
-  def addToAll(xs: List[Int])(x: Int): List[Int] = TODO
+  def addToAll(xs: List[Int])(x: Int): List[Int] = xs match {
+    case head::tail => (head + x) :: addToAll(tail)(x)
+    case _ => Nil
+  }
 
   /**
   * TODO:
   * Rewrite add2toAll using addToAll and partial function application
   */
-  def nicelyAdd2ToAll(xs: List[Int]): List[Int] = TODO
+  def nicelyAdd2ToAll: (List[Int] => List[Int]) = addToAll(_)(2)
 
   /**
   * TODO:
   * Write the map function
   * This function applies the f function to all the elements of xs
   */
-  def map(f: (Int => Int))(xs: List[Int]): List[Int] = TODO
+  def map(f: (Int => Int))(xs: List[Int]): List[Int] = xs match {
+    case head::tail => f(head) :: map(f)(tail)
+    case _ => Nil
+  }
 
   /**
   * TODO:
   * Explain what this does
+  * SOLUTION ==> It uses map to apply the provided function to all elements of this List
+  *     Since the provided function adds 2 to an Int, add2ToAllAgain adds 2 to each Ints of this List
   */
   def add2ToAllAgain(xs: List[Int]): List[Int] = map(x => x + 2)(xs)
 
   /**
   * TODO:
   * Explain how this works
+  * SOLUTION ==> This is building a function that adds 2 to all elements of a List, by partially applying map
   */
   val add2ToAllAgainAlternative = map(x => x + 2) _
 
@@ -260,26 +282,42 @@ object Collections {
   * Write the reduce function
   * reduce((acc, current) => acc + current)(List(1, 2, 3, 4, 5)) == 15
   */
-  def reduce(f: (Int, Int) => Int)(xs: List[Int]): Int = TODO
+  def reduce(f: (Int, Int) => Int)(xs: List[Int]): Int = {
+
+    def r(i: Int)(ls: List[Int]): Int = ls match {
+      case Nil => i
+      case h::t => r(f(i,h))(t)
+    }
+
+    xs match{
+      case Nil => throw new RuntimeException("Can't reduce on empty list")
+      case h::t => r(h)(t)
+    }
+  }
 
   /**
   * TODO:
   * Write the fold function
   */
-  def fold(f: (Int, Int) => Int, init: Int)(xs: List[Int]): Int = TODO
+  def fold(f: (Int, Int) => Int, init: Int)(xs: List[Int]): Int = xs match {
+    case Nil => init
+    case h::tail => fold(f, f(init, h))(tail)
+  }
 
   /**
   * TODO:
   * re-write reduce using fold
   */
-  def reduceByFolding(f: (Int, Int) => Int)(xs: List[Int]): Int = TODO
+  def reduceByFolding(f: (Int, Int) => Int)(xs: List[Int]): Int = fold(f, xs.head)(xs.tail)
 
   /**
   * TODO:
   * re-write the map function using fold
   * you can use List#foldLeft
   */
-  def mapByFolding(f: Int => Int)(xs: List[Int]): List[Int] = TODO
+  def mapByFolding(f: Int => Int)(xs: List[Int]): List[Int] = xs.foldLeft(Nil: List[Int]){ (acc, n) =>
+    f(n) :: acc
+  }.reverse
 
   // >>> Read It Later
   //  ➽ http://www.codecommit.com/blog/scala/scala-collections-for-the-easily-bored-part-1
@@ -347,7 +385,10 @@ object Generics {
      * write the zip method
      * It takes a List[A], a List[B] and returns a List[(A,B)] (use map)
      */
-    def zip[A, B](xs1: List[A], xs2: List[B]): List[(A, B)] = TODO
+    def zip[A, B](xs1: List[A], xs2: List[B]): List[(A, B)] = (xs1, xs2) match {
+      case (_, Nil) | (Nil, _) => Nil
+      case _ => (xs1.head, xs2.head) :: zip(xs1.tail, xs2.tail)
+    }
 
     // TODO: http://stackoverflow.com/questions/4465948/what-are-scala-context-and-view-bounds
     // <%
@@ -469,17 +510,6 @@ object Implicits {
     }
   }
 
-
-  /**
-  * TODO; write an implementation of EqEquality that work for any type X that have a method ==(b: X): Boolean
-  * HELP: google Structural typing
-  */
-  // TODO: ask Sadek
-  type C= { def ==(b: C): Boolean }
-  object EqEquality extends Equality[C]{
-    override def eq(a: C, b: C): Boolean = a == b
-  }
-
 }
 
 
@@ -495,11 +525,11 @@ object FunkyUnapply {
   object ||| {
     def unapply[A,B](t: (Option[A], Option[B])): Option[(Option[A], Option[B])] = t match {
       case (o1: None.type, o2: None.type) => None
-      case _ => Option(t._1 -> t._2)
+      case _ => Option(t)
     }
   }
 }
 
 
-// >>> More exercices
+// IF EVERYTHING FELT WAAAAAYYYY TOO EASY (and you know what a monad is about)
 //  ➽ http://blog.tmorris.net/monad-exercises-in-scala/

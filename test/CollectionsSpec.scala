@@ -8,7 +8,7 @@ import exercices.Collections._
 class CollectionsSpec extends Specification {
 
   val xs = (1 to 10).toList
-  val xsPlus2 = (1 + 2 to 10 + 2).toList
+  val xsPlus2 = ((1 + 2) to (10 + 2)).toList
 
   "uglysum" should {
     "Compute the sum of a list of Int" in {
